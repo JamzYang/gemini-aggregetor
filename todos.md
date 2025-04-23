@@ -61,27 +61,27 @@
 
 ## HTTP 代理服务器 (`src/server.ts`)
 
-- [ ] 创建 Express 应用实例
-- [ ] 使用配置模块加载端口号
-- [ ] 启动服务器并监听端口
-- [ ] 集成日志中间件 (请求日志)
-- [ ] 集成代理路由 (`src/routes/proxy.ts`)
-- [ ] 集成统一错误处理中间件 (`src/middlewares/errorHandler.ts`) (应放在路由之后)
+- [x] 创建 Express 应用实例
+- [x] 使用配置模块加载端口号
+- [x] 启动服务器并监听端口
+- [x] 集成日志中间件 (请求日志)
+- [x] 集成代理路由 (`src/routes/proxy.ts`)
+- [x] 集成统一错误处理中间件 (`src/middlewares/errorHandler.ts`) (应放在路由之后)
 
 ## 代理路由 (`src/routes/proxy.ts`)
 
-- [ ] 创建 Express Router
-- [ ] 定义 `POST /v1beta/models/:model:generateContent` (或其他 Gemini API 路径) 路由
-- [ ] 在路由处理函数中：
-    - [ ] 解析客户端请求 (路径参数, 请求体)
-    - [ ] 调用 `RequestDispatcher` 获取 `ApiKey`
-    - [ ] 处理获取不到 Key 的情况
-    - [ ] 调用 `GoogleApiForwarder` 转发请求
-    - [ ] 处理来自 `GoogleApiForwarder` 的响应：
-        - [ ] 如果是普通响应，将其发送回客户端
-        - [ ] 如果是流式响应，调用流式响应处理逻辑将流 pipe 到客户端响应
-    - [ ] 处理来自 `GoogleApiForwarder` 的错误
-    - [ ] 调用 `ApiKeyManager` 的 `decrementRequestCount` (如果适用)
+- [x] 创建 Express Router
+- [x] 定义 `POST /v1beta/models/:model:generateContent` (或其他 Gemini API 路径) 路由
+- [x] 在路由处理函数中：
+    - [x] 解析客户端请求 (路径参数, 请求体)
+    - [x] 调用 `RequestDispatcher` 获取 `ApiKey`
+    - [x] 处理获取不到 Key 的情况
+    - [x] 调用 `GoogleApiForwarder` 转发请求
+    - [x] 处理来自 `GoogleApiForwarder` 的响应：
+        - [x] 如果是普通响应，将其发送回客户端
+        - [x] 如果是流式响应，调用流式响应处理逻辑将流 pipe 到客户端响应
+    - [x] 处理来自 `GoogleApiForwarder` 的错误
+    - [x] 调用 `ApiKeyManager` 的 `decrementRequestCount` (如果适用)
 
 ## 中间件 (`src/middlewares/`)
 
@@ -100,7 +100,7 @@
 
 ## 测试 (Testing)
 
-- [ ] 编写 `ApiKeyManager` 的单元测试
+- [x] 编写 `ApiKeyManager` 的单元测试
 - [ ] 编写 `RequestDispatcher` 的单元测试
 - [ ] 编写 `GoogleApiForwarder` 的模拟测试 (mock Google API)
 - [ ] 编写代理路由的集成测试

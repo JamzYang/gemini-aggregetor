@@ -211,9 +211,10 @@ gemini-aggregator/
 │   ├── middlewares/          # Express 中间件
 │   │   ├── errorHandler.ts   # 统一错误处理
 │   │   └── logger.ts         # 请求日志
-│   └── types/                # TypeScript 类型定义
-│       ├── index.ts
-│       └── ApiKey.ts         # Key 状态等类型
+│   ├── types/                # TypeScript 类型定义
+│   │   ├── index.ts
+│   |   └── ApiKey.ts         # Key 状态等类型
+|   |__ __tests__
 ├── .env.example              # 环境变量示例文件
 ├── .gitignore                # Git 忽略配置
 ├── package.json              # 项目元数据与依赖
