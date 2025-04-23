@@ -96,7 +96,25 @@ export default function createProxyRouter(
         // 处理流式响应
         console.info(`ProxyRoute: 处理流式响应 (${apiKey.key})`);
         // 调用 StreamHandler 处理流
-        await streamHandler.handleStream(forwardResult.stream, res); // 等待流处理完成
+        // 处理 AsyncIterable 并将其内容发送到响应
+        // 设置响应头为 Server-Sent Events
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+
+        // 处理 AsyncIterable 并将其内容格式化为 SSE 发送
+        console.info(`ProxyRoute: 开始处理流式数据 (${apiKey.key})`);
+        for await (const chunk of forwardResult.stream) {
+          console.info(`ProxyRoute: 接收到流式数据块 (${apiKey.key})`);
+          // 将 chunk 转换为 JSON 字符串
+          const data = JSON.stringify(chunk);
+          // 格式化为 SSE 事件
+          res.write(`data: ${data}\n\n`);
+        }
+        console.info(`ProxyRoute: 流式数据处理完毕 (${apiKey.key})`);
+        // 流处理完毕，发送一个结束事件 (可选，取决于客户端如何处理)
+        // res.write('event: end\ndata: {}\n\n');
+        res.end(); // 结束响应
 
       } else if (forwardResult.response) {
         // 处理非流式响应

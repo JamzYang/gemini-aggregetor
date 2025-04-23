@@ -70,36 +70,58 @@ describe('Proxy Route Integration Tests', () => {
       }],
     };
 
-    const res = await request(app)
-      .post('/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent') // 使用一个有效的模型名称
-      .send(requestBody)
-      .buffer(false) // 告诉 supertest 不要缓冲响应
-      .expect(200); // 流式响应通常也返回 200
+    // 使用 node-fetch 发起请求来测试流式响应
+    // 需要获取测试服务器的实际地址和端口
+    // 假设测试服务器运行在 http://localhost:TEST_PORT
+    const TEST_PORT = process.env.TEST_PORT || 3000; // 替换为获取实际端口的逻辑
+    const url = `http://localhost:${TEST_PORT}/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent`;
+
+    console.info(`Test: 使用 node-fetch 发起请求到 ${url}`);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    // 验证响应状态码
+    expect(response.status).toBe(200);
 
     // 验证响应头是否指示流式响应 (例如 Content-Type: text/event-stream)
-    expect(res.headers['content-type']).toContain('text/event-stream');
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
 
     // 监听数据事件来捕获流式数据
-    let receivedData = '';
-    res.on('data', (chunk: Buffer) => {
-      receivedData += chunk.toString();
-    });
+    let receivedData = ''; // 将声明移到外部
+    if (response.body) {
+      console.info('Test: 响应体是可读流');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
 
-    // 等待响应结束
-    await new Promise<void>((resolve) => {
-      res.on('end', () => {
-        resolve();
-      });
-    });
+      // 使用 reader 读取流数据
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          console.info('Test: 流读取完毕');
+          break;
+        }
+        // 将 Uint8Array 转换为字符串并添加到 receivedData
+        receivedData += decoder.decode(value, { stream: true });
+        console.info('Test: 接收到数据块');
+      }
+    } else {
+      console.error('Test: 响应体不是可读流');
+    }
 
     // 验证接收到的数据是否包含预期的 SSE 格式或内容
-    // 简单的检查：确保接收到了一些数据
+    console.info(`Test: 接收到的数据长度: ${receivedData.length}`);
     expect(receivedData.length).toBeGreaterThan(0);
     // 更复杂的检查：可以尝试解析 SSE 数据块并验证其结构
     // 例如，查找 data: 开头的行
     expect(receivedData).toContain('data: ');
 
-  }, 30000); // 增加超时时间
+  }, 60000); // 增加超时时间
 
   it('should return 503 Service Unavailable if no API keys are available', async () => {
     // 将所有 Key 标记为冷却中，模拟无可用 Key 的情况

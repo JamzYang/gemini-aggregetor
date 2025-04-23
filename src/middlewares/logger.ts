@@ -19,10 +19,10 @@ const loggerMiddleware = pinoHttp({
   logger: logger,
   // 自定义日志消息，包含请求方法、URL、状态码和响应时间
   customSuccessMessage: function (req: Request, res: Response) {
-    return `${req.method} ${req.originalUrl} ${res.statusCode} - ${res.responseTime}ms`;
+    return `${req.method} ${req.originalUrl} ${res.statusCode} `;
   },
   customErrorMessage: function (req: Request, res: Response, err: Error) {
-     return `${req.method} ${req.originalUrl} ${res.statusCode} - ${res.responseTime}ms - Error: ${err.message}`;
+     return `${req.method} ${req.originalUrl} ${res.statusCode} - Error: ${err.message}`;
   },
   // 过滤掉健康检查等不重要的日志 (可选)
   // autoLogging: {

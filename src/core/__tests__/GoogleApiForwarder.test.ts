@@ -26,43 +26,31 @@ describe('GoogleApiForwarder', () => {
     // 清除所有模拟
     jest.clearAllMocks();
 
-    // 创建 GenerativeModel 的模拟实例
-    mockGenerativeModel = jest.mocked({
+    // Mock the methods on the prototype of GenerativeModel
+    // This avoids needing to mock the private _requestOptions property
+    mockGenerativeModel = {
       generateContent: jest.fn(),
       generateContentStream: jest.fn(),
-      // 模拟其他可能用到的方法，如果需要的话
-      // 为了满足 Mocked<GenerativeModel> 的类型要求，可能需要添加一些 dummy 属性
-      model: 'mock-model',
-      apiKey: 'mock-key',
-      generationConfig: {},
-      safetySettings: [],
-      batchEmbedContents: jest.fn(),
-      embedContent: jest.fn(),
-      countTokens: jest.fn(),
-      // 添加缺失的属性以满足 Mocked<GenerativeModel> 的类型要求
-      // _requestOptions 是私有属性，不应包含在模拟中
-      cachedContent: [], // 假设是一个数组
-      startChat: jest.fn(), // 模拟方法
-    } as GenerativeModel); // 使用 as GenerativeModel 进行类型断言
+      // Add other methods if needed by the tests
+    } as any; // Use 'any' for the mock implementation
 
-    // 创建 GoogleGenerativeAI 的模拟实例
-    mockGoogleGenerativeAI = jest.mocked({
-      getGenerativeModel: jest.fn().mockReturnValue(mockGenerativeModel),
-      // 为了满足 Mocked<GoogleGenerativeAI> 的类型要求，可能需要添加一些 dummy 属性
-      apiKey: 'mock-key',
-      getGenerativeModelFromCachedContent: jest.fn(),
-      // ... 添加其他缺失的属性和方法
-    } as GoogleGenerativeAI); // 使用 as GoogleGenerativeAI 进行类型断言
+    // Mock the getGenerativeModel method on the prototype of GoogleGenerativeAI
+    // This controls what is returned when getGenerativeModel is called
+    mockGoogleGenerativeAI = {
+        getGenerativeModel: jest.fn().mockReturnValue(mockGenerativeModel),
+        // Add other methods if needed by the tests
+    } as any; // Use 'any' for the mock implementation
 
-
-    // 设置 GoogleGenerativeAI 构造函数的模拟实现
-    (GoogleGenerativeAI as any).mockImplementation((apiKey: string) => {
-      // 验证构造函数是否接收了正确的 API Key
-      expect(apiKey).toBe(mockApiKey.key);
-      return mockGoogleGenerativeAI;
+    // Set the mock implementation for the GoogleGenerativeAI constructor
+    // This ensures that when `new GoogleGenerativeAI(...)` is called,
+    // it returns our mock object.
+    (GoogleGenerativeAI as jest.Mock).mockImplementation((apiKey: string) => {
+        // Verify constructor received correct API Key
+        expect(apiKey).toBe(mockApiKey.key);
+        return mockGoogleGenerativeAI;
     });
 
-    // 实例化 GoogleApiForwarder
+    // Instantiate GoogleApiForwarder
     googleApiForwarder = new GoogleApiForwarder();
   });
 
@@ -73,7 +61,7 @@ describe('GoogleApiForwarder', () => {
     // 设置模拟的 generateContent 方法的返回值
     mockGenerativeModel.generateContent.mockResolvedValue({ response: mockResponse } as any);
 
-    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody), mockApiKey);
+    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody).params.model, 'generateContent', requestBody, mockApiKey);
 
     // 验证 GoogleGenerativeAI 构造函数是否被调用
     expect(GoogleGenerativeAI).toHaveBeenCalledTimes(1);
@@ -98,7 +86,7 @@ describe('GoogleApiForwarder', () => {
     // 设置模拟的 generateContentStream 方法的返回值
     mockGenerativeModel.generateContentStream.mockResolvedValue({ stream: mockStream } as any);
 
-    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody), mockApiKey);
+    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody).params.model, 'generateContentStream', requestBody, mockApiKey);
 
     // 验证 generateContentStream 是否被调用
     expect(mockGenerativeModel.generateContentStream).toHaveBeenCalledTimes(1);
@@ -119,7 +107,7 @@ describe('GoogleApiForwarder', () => {
     // 设置模拟的 generateContent 方法抛出错误
     mockGenerativeModel.generateContent.mockRejectedValue(mockError);
 
-    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody), mockApiKey);
+    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody).params.model, 'generateContent', requestBody, mockApiKey);
 
     // 验证 generateContent 是否被调用
     expect(mockGenerativeModel.generateContent).toHaveBeenCalledTimes(1);
@@ -141,7 +129,7 @@ describe('GoogleApiForwarder', () => {
     // 设置模拟的 generateContent 方法抛出错误
     mockGenerativeModel.generateContent.mockRejectedValue(mockError);
 
-    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody), mockApiKey);
+    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody).params.model, 'generateContent', requestBody, mockApiKey);
 
     // 验证返回结果包含错误
     expect(result.error).toBeInstanceOf(GoogleApiError);
@@ -161,7 +149,7 @@ describe('GoogleApiForwarder', () => {
     // 设置模拟的 generateContentStream 方法抛出错误
     mockGenerativeModel.generateContentStream.mockRejectedValue(mockError);
 
-    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody), mockApiKey);
+    const result = await googleApiForwarder.forwardRequest(mockRequest(requestBody).params.model, 'generateContentStream', requestBody, mockApiKey);
 
     // 验证 generateContentStream 是否被调用
     expect(mockGenerativeModel.generateContentStream).toHaveBeenCalledTimes(1);
