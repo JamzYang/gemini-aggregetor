@@ -20,6 +20,9 @@ const requestDispatcher = new RequestDispatcher(apiKeyManager); // Assuming Requ
 // Create the proxy router by calling the function
 const proxyRouter = createProxyRouter(apiKeyManager, requestDispatcher, googleApiForwarder, streamHandler);
 
+// 集成解析 JSON 请求体的中间件
+app.use(express.json());
+
 // 集成请求日志中间件
 app.use(loggerMiddleware);
 
