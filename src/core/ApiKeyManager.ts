@@ -8,7 +8,7 @@ class ApiKeyManager {
   constructor() {
     this.loadKeys();
     // 定期检查冷却中的 Key 是否可恢复
-    setInterval(() => this.checkCoolingDownKeys(), 5000); // 每 5 秒检查一次
+    setInterval(() => this.checkCoolingDownKeys(), 2000); // 每 2 秒检查一次
   }
 
   loadKeys(): void {

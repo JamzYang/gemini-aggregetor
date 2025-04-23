@@ -24,7 +24,7 @@ const proxyRouter = createProxyRouter(apiKeyManager, requestDispatcher, googleAp
 app.use(express.json());
 
 // 集成请求日志中间件
-app.use(loggerMiddleware);
+// app.use(loggerMiddleware); //todo 暂时不用日志组件
 
 // 集成代理路由
 app.use('/', proxyRouter); // Use the created router instance

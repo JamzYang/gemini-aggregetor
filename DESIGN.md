@@ -214,7 +214,7 @@ gemini-aggregator/
 │   ├── types/                # TypeScript 类型定义
 │   │   ├── index.ts
 │   |   └── ApiKey.ts         # Key 状态等类型
-|   |__ __tests__
+|   |__ __tests__             # 测试  
 ├── .env.example              # 环境变量示例文件
 ├── .gitignore                # Git 忽略配置
 ├── package.json              # 项目元数据与依赖

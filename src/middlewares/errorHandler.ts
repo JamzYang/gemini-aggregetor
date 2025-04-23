@@ -4,8 +4,6 @@ import { GoogleApiError } from '../core/GoogleApiForwarder'; // 导入自定义�
 import ApiKeyManager from '../core/ApiKeyManager'; // 导入 ApiKeyManager (用于处理速率限制)
 import config from '../config'; // 导入配置
 
-// 实例化 ApiKeyManager (这里简化处理，实际应用中可能通过依赖注入或单例模式管理)
-const apiKeyManager = new ApiKeyManager();
 
 const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
   // 记录详细错误日志

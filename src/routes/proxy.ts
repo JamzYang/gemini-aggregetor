@@ -105,7 +105,6 @@ export default function createProxyRouter(
         // 处理 AsyncIterable 并将其内容格式化为 SSE 发送
         console.info(`ProxyRoute: 开始处理流式数据 (${apiKey.key})`);
         for await (const chunk of forwardResult.stream) {
-          console.info(`ProxyRoute: 接收到流式数据块 (${apiKey.key})`);
           // 将 chunk 转换为 JSON 字符串
           const data = JSON.stringify(chunk);
           // 格式化为 SSE 事件
