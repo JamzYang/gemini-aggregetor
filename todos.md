@@ -14,50 +14,50 @@
 
 ## 配置模块 (`src/config/index.ts`)
 
-- [ ] 实现加载 `.env` 文件的逻辑
-- [ ] 定义并导出类型安全的配置对象 (PORT, GEMINI_API_KEYS, KEY_COOL_DOWN_DURATION_MS, LOG_LEVEL, DISPATCH_STRATEGY)
+- [x] 实现加载 `.env` 文件的逻辑
+- [x] 定义并导出类型安全的配置对象 (PORT, GEMINI_API_KEYS, KEY_COOL_DOWN_DURATION_MS, LOG_LEVEL, DISPATCH_STRATEGY)
 
 ## 类型定义 (`src/types/`)
 
-- [ ] 定义 `ApiKey` 接口 (`src/types/ApiKey.ts`) 包含 `key`, `status`, `coolingDownUntil`, `currentRequests` 等字段
-- [ ] 创建 `src/types/index.ts` 用于导出所有类型
+- [x] 定义 `ApiKey` 接口 (`src/types/ApiKey.ts`) 包含 `key`, `status`, `coolingDownUntil`, `currentRequests` 等字段
+- [x] 创建 `src/types/index.ts` 用于导出所有类型
 
 ## API Key 管理器 (`src/core/ApiKeyManager.ts`)
 
-- [ ] 实现 `ApiKeyManager` 类
-- [ ] 实现 `loadKeys()` 方法从配置加载 API Keys
-- [ ] 实现 Key 池的数据结构 (例如 `Map<string, ApiKey>`)
-- [ ] 实现 `getAvailableKey()` 方法，根据状态和冷却时间选择可用 Key
-- [ ] 实现 `markAsCoolingDown(key: string, durationMs: number)` 方法
-- [ ] 实现 `markAsAvailable(key: string)` 方法
-- [ ] 实现 `incrementRequestCount(key: string)` 和 `decrementRequestCount(key: string)` (如果选择实现基于连接数的策略)
-- [ ] 实现定期检查冷却 Key 是否可恢复的逻辑 (例如使用 `setInterval`)
-- [ ] 考虑并处理并发访问 Key 池的潜在问题 (虽然 Node.js 单线程，但异步操作可能影响)
+- [x] 实现 `ApiKeyManager` 类
+- [x] 实现 `loadKeys()` 方法从配置加载 API Keys
+- [x] 实现 Key 池的数据结构 (例如 `Map<string, ApiKey>`)
+- [x] 实现 `getAvailableKey()` 方法，根据状态和冷却时间选择可用 Key
+- [x] 实现 `markAsCoolingDown(key: string, durationMs: number)` 方法
+- [x] 实现 `markAsAvailable(key: string)` 方法
+- [x] 实现 `incrementRequestCount(key: string)` 和 `decrementRequestCount(key: string)` (如果选择实现基于连接数的策略)
+- [x] 实现定期检查冷却 Key 是否可恢复的逻辑 (例如使用 `setInterval`)
+- [x] 考虑并处理并发访问 Key 池的潜在问题 (虽然 Node.js 单线程，但异步操作可能影响)
 
 ## 请求分发器 (`src/core/RequestDispatcher.ts`)
 
-- [ ] 实现 `RequestDispatcher` 类
-- [ ] 注入 `ApiKeyManager` 实例
-- [ ] 实现 `selectApiKey()` 方法
-- [ ] 实现至少一种 Key 选择策略 (例如简单轮询)
-- [ ] 处理无法获取可用 Key 的情况 (返回 null 或抛出错误)
+- [x] 实现 `RequestDispatcher` 类
+- [x] 注入 `ApiKeyManager` 实例
+- [x] 实现 `selectApiKey()` 方法
+- [x] 实现至少一种 Key 选择策略 (例如简单轮询)
+- [x] 处理无法获取可用 Key 的情况 (返回 null 或抛出错误)
 
 ## Google API 转发器 (`src/core/GoogleApiForwarder.ts`)
 
-- [ ] 实现 `GoogleApiForwarder` 类
-- [ ] 实现 `forwardRequest(clientRequest: Request, apiKey: ApiKey)` 方法
-- [ ] 使用 `@google/generative-ai` SDK 或 `https` 模块构造和发送请求
-- [ ] 正确设置 `x-goog-api-key` 等请求头
-- [ ] 复制必要的客户端请求头和请求体
-- [ ] 实现非流式请求的处理逻辑
-- [ ] 识别 Google API 返回的错误，特别是 429 错误
+- [x] 实现 `GoogleApiForwarder` 类
+- [x] 实现 `forwardRequest(clientRequest: Request, apiKey: ApiKey)` 方法
+- [x] 使用 `@google/generative-ai` SDK 或 `https` 模块构造和发送请求
+- [x] 正确设置 `x-goog-api-key` 等请求头
+- [x] 复制必要的客户端请求头和请求体
+- [x] 实现非流式请求的处理逻辑
+- [x] 识别 Google API 返回的错误，特别是 429 错误
 
 ## 流式响应处理器 (集成在 `GoogleApiForwarder.ts` 或 `proxy.ts` 或 `src/core/StreamHandler.ts`)
 
-- [ ] 实现处理 Google API 流式响应 (`generateContentStream`) 的逻辑
-- [ ] 监听流的 `data` 事件，并将数据块 (`chunk`) 实时写入客户端响应流 (`response.write(chunk)`)
-- [ ] 监听流的 `end` 事件，结束客户端响应流 (`response.end()`)
-- [ ] 监听流的 `error` 事件，进行错误处理
+- [x] 实现处理 Google API 流式响应 (`generateContentStream`) 的逻辑
+- [x] 监听流的 `data` 事件，并将数据块 (`chunk`) 实时写入客户端响应流 (`response.write(chunk)`)
+- [x] 监听流的 `end` 事件，结束客户端响应流 (`response.end()`)
+- [x] 监听流的 `error` 事件，进行错误处理
 
 ## HTTP 代理服务器 (`src/server.ts`)
 
@@ -86,17 +86,17 @@
 ## 中间件 (`src/middlewares/`)
 
 - [ ] **日志中间件 (`logger.ts`)**:
-    - [ ] 使用选定的日志库 (pino/winston) 创建日志记录器实例
-    - [ ] 实现记录请求信息的中间件 (方法, URL, 状态码, 耗时等)
+    - [x] 使用选定的日志库 (pino/winston) 创建日志记录器实例
+    - [x] 实现记录请求信息的中间件 (方法, URL, 状态码, 耗时等)
 - [ ] **错误处理中间件 (`errorHandler.ts`)**:
-    - [ ] 实现 Express 错误处理中间件 `(err, req, res, next)`
-    - [ ] 识别错误类型 (自定义错误、HTTP 错误、Google API 错误)
-    - [ ] **处理 429 错误**:
-        - [ ] 从错误信息中提取触发限制的 Key (需要 `GoogleApiForwarder` 传递此信息)
-        - [ ] 调用 `ApiKeyManager.markAsCoolingDown()`
+    - [x] 实现 Express 错误处理中间件 `(err, req, res, next)`
+    - [x] 识别错误类型 (自定义错误、HTTP 错误、Google API 错误)
+    - [x] **处理 429 错误**:
+        - [x] 从错误信息中提取触发限制的 Key (需要 `GoogleApiForwarder` 传递此信息)
+        - [x] 调用 `ApiKeyManager.markAsCoolingDown()`
         - [ ] 实现可选的重试逻辑 (获取新 Key 并重新调用转发)
-    - [ ] 记录详细错误日志
-    - [ ] 向客户端发送标准化的错误响应 (JSON 格式)
+    - [x] 记录详细错误日志
+    - [x] 向客户端发送标准化的错误响应 (JSON 格式)
 
 ## 测试 (Testing)
 
