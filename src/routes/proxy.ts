@@ -16,9 +16,30 @@ export default function createProxyRouter(
   const router = Router();
 
   // 定义代理路由，匹配 Gemini API 的 generateContent 路径
-  router.post('/v1beta/models/:model:generateContent', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // 定义代理路由，匹配 Gemini API 的 models/{model}:{method} 路径
+  // 使用正则表达式捕获 model 和 method
+  router.post(/^\/v1beta\/models\/([^:]+):([^:]+)$/, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let apiKey = null;
     try {
+      // 从正则表达式捕获组中提取 modelId 和 methodName
+      const modelId = req.params[0]; // 第一个捕获组是 modelId
+      const methodName = req.params[1]; // 第二个捕获组是 methodName
+      const requestBody = req.body; // 获取请求体
+
+      // 验证方法名是否是 generateContent 或 streamGenerateContent
+      if (methodName !== 'generateContent' && methodName !== 'streamGenerateContent') {
+         console.warn(`ProxyRoute: 不支持的 API 方法: ${methodName}`);
+         res.status(400).json({
+            error: {
+               code: 400,
+               message: `Bad Request: Unsupported API method "${methodName}". Only "generateContent" and "streamGenerateContent" are supported.`,
+               status: 'INVALID_ARGUMENT',
+            },
+         });
+         return; // 结束请求处理
+      }
+
+
       // 1. 获取可用 API Key
       apiKey = await requestDispatcher.selectApiKey();
 
@@ -40,7 +61,8 @@ export default function createProxyRouter(
       // apiKeyManager.incrementRequestCount(apiKey.key);
 
       // 2. 转发请求到 Google API
-      const forwardResult = await googleApiForwarder.forwardRequest(req, apiKey);
+      // 调用 forwardRequest 时传递 modelId, methodName 和 requestBody
+      const forwardResult = await googleApiForwarder.forwardRequest(modelId, methodName, requestBody, apiKey);
 
       // 可选：减少 Key 的当前请求计数 (无论成功或失败，请求结束时都应减少)
       if (apiKey) {

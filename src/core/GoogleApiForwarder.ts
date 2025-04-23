@@ -19,27 +19,34 @@ export class GoogleApiError extends Error {
 }
 
 class GoogleApiForwarder {
-  async forwardRequest(clientRequest: Request, apiKey: ApiKey): Promise<{ response?: any, stream?: AsyncIterable<GenerateContentResponse>, error?: GoogleApiError }> {
-    const { model } = clientRequest.params;
+  async forwardRequest(modelId: string, methodName: string, requestBody: any, apiKey: ApiKey): Promise<{ response?: any, stream?: AsyncIterable<GenerateContentResponse>, error?: GoogleApiError }> {
     const genAI = new GoogleGenerativeAI(apiKey.key);
-    const generativeModel = genAI.getGenerativeModel({ model });
+    const generativeModel = genAI.getGenerativeModel({ model: modelId });
 
     try {
-      // 假设客户端请求体是 JSON 格式，并且包含 generateContent 所需的参数
-      const requestBody = clientRequest.body;
-      const isStreaming = requestBody.stream === true;
-
-      if (isStreaming) {
-        // 处理流式请求
-        const streamingResult = await generativeModel.generateContentStream(requestBody);
-        console.info(`GoogleApiForwarder: 转发流式请求到模型 ${model} 使用 Key ${apiKey.key}`);
-        return { stream: streamingResult.stream };
-      } else {
+      let result;
+      if (methodName === 'generateContent') {
         // 处理非流式请求
-        const result = await generativeModel.generateContent(requestBody);
+        result = await generativeModel.generateContent(requestBody);
         const response = result.response;
-        console.info(`GoogleApiForwarder: 转发非流式请求到模型 ${model} 使用 Key ${apiKey.key}`);
+        console.info(`GoogleApiForwarder: 转发非流式请求到模型 ${modelId} 使用 Key ${apiKey.key}`);
         return { response };
+      } else if (methodName === 'streamGenerateContent') {
+        // 处理流式请求
+        result = await generativeModel.generateContentStream(requestBody);
+        console.info(`GoogleApiForwarder: 转发流式请求到模型 ${modelId} 使用 Key ${apiKey.key}`);
+        return { stream: result.stream };
+      } else {
+        // 理论上这部分代码不会被执行，因为 ProxyRoute 已经做了方法名验证
+        // 但作为防御性编程，保留此处的错误处理
+        const unsupportedMethodError = new GoogleApiError(
+          `Unsupported API method: ${methodName}`,
+          400, // Bad Request
+          apiKey.key,
+          false
+        );
+        console.error(`GoogleApiForwarder: 不支持的 API 方法 (${apiKey.key}):`, methodName);
+        return { error: unsupportedMethodError };
       }
 
     } catch (error: any) {

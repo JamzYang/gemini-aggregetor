@@ -68,12 +68,10 @@ describe('Proxy Route Integration Tests', () => {
       contents: [{
         parts: [{ text: 'Tell me a longer story about a dog.' }],
       }],
-      // 确保请求参数中包含 stream=true
-      stream: true,
     };
 
     const res = await request(app)
-      .post('/v1beta/models/gemini-pro:generateContent') // 使用一个有效的模型名称
+      .post('/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent') // 使用一个有效的模型名称
       .send(requestBody)
       .buffer(false) // 告诉 supertest 不要缓冲响应
       .expect(200); // 流式响应通常也返回 200
@@ -114,7 +112,7 @@ describe('Proxy Route Integration Tests', () => {
     };
 
     const res = await request(app)
-      .post('/v1beta/models/gemini-pro:generateContent')
+      .post('/v1beta/models/gemini-2.0-flash-lite:generateContent')
       .send(requestBody)
       .expect(503); // 期望返回 503 Service Unavailable
 
@@ -146,7 +144,7 @@ describe('Proxy Route Integration Tests', () => {
 
     // 发送请求，期望收到 429 错误
     const res = await request(app)
-      .post('/v1beta/models/gemini-pro:generateContent')
+      .post('/v1beta/models/gemini-2.0-flash-lite:generateContent')
       .send(requestBody)
       .expect(429); // 期望返回 429
 
@@ -187,7 +185,7 @@ describe('Proxy Route Integration Tests', () => {
 
     // 发送请求，期望收到 401 错误
     const res = await request(app)
-      .post('/v1beta/models/gemini-pro:generateContent')
+      .post('/v1beta/models/gemini-2.0-flash-lite:generateContent')
       .send(requestBody)
       .expect(401); // 期望返回 401
 
@@ -230,7 +228,7 @@ describe('Proxy Route Integration Tests', () => {
 
     // 发送请求，期望收到 500 错误
     const res = await request(app)
-      .post('/v1beta/models/gemini-pro:generateContent')
+      .post('/v1beta/models/gemini-2.0-flash-lite:generateContent')
       .send(requestBody)
       .expect(500); // 期望返回 500
 
