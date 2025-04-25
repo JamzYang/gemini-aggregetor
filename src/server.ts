@@ -21,7 +21,7 @@ const requestDispatcher = new RequestDispatcher(apiKeyManager); // Assuming Requ
 const proxyRouter = createProxyRouter(apiKeyManager, requestDispatcher, googleApiForwarder, streamHandler);
 
 // 集成解析 JSON 请求体的中间件
-app.use(express.json());
+app.use(express.json({ limit: '8mb' }));
 
 // 集成请求日志中间件
 // app.use(loggerMiddleware); //todo 暂时不用日志组件
